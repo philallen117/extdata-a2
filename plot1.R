@@ -1,7 +1,15 @@
 ## plot1.R
 
-## Get prepared data, if necessary
-if (!exists("NEI")) source("getdata.R")
+if (!exists("NEI")) {
+	if(!file.exists("./data")) {
+		hpcURL <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+		dir.create("data")
+		download.file(url = hpcURL, destfile = "data/hpc.zip")
+		unzip("data/hpc.zip", exdir = "data")
+	}
+	NEI <- readRDS("data/summarySCC_PM25.rds")
+	SCC <- readRDS("data/Source_Classification_Code.rds")
+}
 
 q1 <- ddply(NEI, .(year), summarise, total = sum(Emissions))
 m1 <- lm(total ~ year, q1)
