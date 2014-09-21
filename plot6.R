@@ -1,4 +1,7 @@
 #plot6.R
+library(plyr)
+library(ggplot2)
+library(scales)
 
 if (!exists("NEI")) {
 	if(!file.exists("./data")) {
@@ -12,6 +15,8 @@ if (!exists("NEI")) {
 	SCC <- SCC[,c("SCC", "Short.Name")]
 }
 
+# Interpret "motor vehicle" as anything under "Highway vehicle" category
+########################################################################
 mvSCC <- subset(SCC, grepl("highway veh", tolower(Short.Name)))
 mvBalt <- subset(NEI, SCC %in% mvSCC$SCC & fips == "24510")
 mvBaltByYear <- ddply(mvBalt, .(year), summarise, total = sum(Emissions))
@@ -32,9 +37,9 @@ mvLAByYear$City <- "Los Angeles"
 # Combine city data for plot
 mvByYear <- rbind(mvBaltByYear, mvLAByYear)
 
-# Plot
-p <- ggplot(mvByYear, aes(year, total))
-p <- p + geom_point()
+# Plot. Use %age on y-axis.
+p <- ggplot(mvByYear, aes(year, total)) + scale_y_continuous(labels=percent)
+p <- p + geom_point(size = 3)
 p <- p + facet_grid(. ~ City)
 p <- p + geom_smooth(method = "loess", se = FALSE)
 p <- p + ggtitle("Baltimore has seen a bigger change than LA in motor vehicle PM2.5 emissions")

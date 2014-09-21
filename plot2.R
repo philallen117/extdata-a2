@@ -1,4 +1,5 @@
 ## plot2.R
+library("plyr")
 
 if (!exists("NEI")) {
 	if(!file.exists("./data")) {
@@ -14,13 +15,16 @@ if (!exists("NEI")) {
 
 baltByYear <- ddply(subset(NEI, fips == "24510"), .(year),
 							summarise, total = sum(Emissions))
+
+# Fit linear model to illustrate trend
 lmBaltByYear <- lm(total ~ year, baltByYear)
 
-png(file = "plot2.png", width = 600, height = 600)
+# Plot using low level functions to prevent false origin on y axis
 
+png(file = "plot2.png", width = 600, height = 600)
 plot.new()
 plot.window(mar=c(2, 8, 1, 1),
-			xlim = c(1999,2008), xaxs = "i",
+			xlim = c(1999,2008), xaxs = "r",
 			ylim = c(0, 4000), yaxs = "i")
 axis(1, c(1999,2002,2005,2008))
 axis(2, las = "1")

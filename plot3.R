@@ -1,4 +1,5 @@
 # plot3.R
+library(plyr)
 library(ggplot2)
 
 if (!exists("NEI")) {
@@ -17,13 +18,13 @@ baltByTypeYear <- ddply(subset(NEI, fips == "24510"), .(type, year),
 			summarise, total = sum(Emissions))
 
 p <- ggplot(baltByTypeYear, aes(year, total))
-p <- p + geom_point()
+p <- p + geom_point(size = 3)
 p <- p + facet_grid(. ~ type)
 p <- p + geom_smooth(method = "loess", se = FALSE)
-p <- p + ggtitle("Comparison of PM2.5 emissions trends by type in Baltimore")
+p <- p + ggtitle("In Baltimore, PM2.5 emissions fall for all types except POINT")
 p <- p + ylab("Total PM2.5 emissions (ton)") + xlab("Year")
 
-png(file = "plot3.png", width = 720, height = 300)
+png(file = "plot3.png", width = 800, height = 300)
 print(p)
 dev.off()
 p <- NULL
