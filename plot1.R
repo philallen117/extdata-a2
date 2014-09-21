@@ -9,10 +9,11 @@ if (!exists("NEI")) {
 	}
 	NEI <- readRDS("data/summarySCC_PM25.rds")
 	SCC <- readRDS("data/Source_Classification_Code.rds")
+	SCC <- SCC[,c("SCC", "Short.Name")]
 }
 
-q1 <- ddply(NEI, .(year), summarise, total = sum(Emissions))
-m1 <- lm(total ~ year, q1)
+totalByYear <- ddply(NEI, .(year), summarise, total = sum(Emissions))
+lmTotalByYear <- lm(total ~ year, totalByYear)
 
 png(file = "plot1.png", width = 600, height = 600)
 plot.new()
@@ -24,6 +25,6 @@ axis(2, las = "1")
 title(xlab="Year")
 title(ylab="Total PM2.5 emissions (ton)")
 title(main = "PM2.5 emissions trend from 1999 to 2008")
-with(q1, points(year, total, pch = 19))
-abline(m1, col="green", lwd="2")
+with(totalByYear, points(year, total, pch = 19))
+abline(lmTotalByYear, col="green", lwd="2")
 dev.off()

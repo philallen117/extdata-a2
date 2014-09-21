@@ -1,5 +1,4 @@
-# plot4.R
-library(ggplot2)
+# plot5.R
 
 if (!exists("NEI")) {
 	if(!file.exists("./data")) {
@@ -13,19 +12,19 @@ if (!exists("NEI")) {
 	SCC <- SCC[,c("SCC", "Short.Name")]
 }
 
-NEI <- merge(NEI, SCC, by = c("SCC"))
-coalSCC <- subset(SCC, grepl("coal", tolower(Short.Name)) &
-			 	grepl("combustion", tolower(Short.Name)))
-coalNEI <- merge(NEI, coalSCC, by = c("SCC")) # simple way to do membership test
-coalByYear <- ddply(coalNEI, .(year), summarise, total = sum(Emissions))
+# Interpret "motor vehicle" as anything under "Highway vehicle"
 
-p <- ggplot(coalByYear, aes(year, total))
+mvSCC <- subset(SCC, grepl("highway veh", tolower(Short.Name)))
+mvBaltNEI <- subset(NEI, SCC %in% mvSCC$SCC & fips == "24510")
+mvBalNEIByYear <- ddply(mvNEI, .(year), summarise, total = sum(Emissions))
+
+p <- ggplot(q5data, aes(year, total))
 p <- p + geom_point()
 p <- p + geom_smooth(method = "loess", se = FALSE)
-p <- p + ggtitle("Trend of PM2.5 emissions related to coal combustion")
+p <- p + ggtitle("Trend of highway vehicle PM2.5 emissions in Baltimore")
 p <- p + ylab("Total PM2.5 emissions (ton)") + xlab("Year")
 
-png(file = "plot4.png", width = 720, height = 300)
+png(file = "plot5.png", width = 720, height = 300)
 print(p)
 dev.off()
 p <- NULL
